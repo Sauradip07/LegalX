@@ -1,5 +1,5 @@
+import React, { useRef, useState, useEffect } from "react";
 import { Message, useChat } from "ai/react";
-import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -24,10 +24,11 @@ export default function ChatList({
   isMobile,
 }: ChatProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = React.useState<string>("");
-  const [localStorageIsLoading, setLocalStorageIsLoading] =
-    React.useState(true);
-  const [initialQuestions, setInitialQuestions] = React.useState<Message[]>([]);
+  const [name, setName] = useState<string>("");
+  const [localStorageIsLoading, setLocalStorageIsLoading] = useState(true);
+  const [initialQuestions, setInitialQuestions] = useState<Message[]>([]);
+  const [uploadEnabled, setUploadEnabled] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -46,7 +47,6 @@ export default function ChatList({
   }, []);
 
   useEffect(() => {
-    // Fetch 4 initial questions
     if (messages.length === 0) {
       const questionCount = isMobile ? 2 : 4;
 
@@ -81,26 +81,35 @@ export default function ChatList({
     }, 1);
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const toggleUpload = () => {
+    setUploadEnabled(!uploadEnabled);
+    setSelectedFile(null);
+  };
+
   if (messages.length === 0) {
     return (
-      <div className="w-full h-full flex justify-center items-center">
+      <div className="w-full h-full flex flex-col justify-center items-center">
+        {/* Logo and introductory text */}
         <div className="relative flex flex-col gap-4 items-center justify-center w-full h-full">
-          <div></div>
-          <div className="flex flex-col gap-4 items-center">
           <Image
-            src={require('../../../public/legalX.png')}
+            src={require("../../../public/legalX.png")}
             alt="AI"
             width={150}
             height={150}
             className="dark:invert hidden 2xl:block"
           />
-            <p className="text-center text-lg text-muted-foreground">
+          <p className="text-center text-lg text-muted-foreground mt-2">
             How may I assist with your legal concerns today?
-            </p>
-          </div>
+          </p>
 
-          <div className="absolute bottom-0 w-full px-4 sm:max-w-3xl grid gap-2 sm:grid-cols-2 sm:gap-4 text-sm">
-            {/* Only display 4 random questions */}
+          {/* Suggested questions */}
+          <div className="mt-4 w-full px-4 sm:max-w-3xl grid gap-2 sm:grid-cols-2 sm:gap-4 text-sm">
             {initialQuestions.length > 0 &&
               initialQuestions.map((message) => {
                 const delay = Math.random() * 0.25;
@@ -131,118 +140,156 @@ export default function ChatList({
               })}
           </div>
         </div>
+
+        {/* Checkbox for enabling file upload */}
+        <div className="mt-6 flex items-center">
+          <input
+            type="checkbox"
+            id="enableUpload"
+            checked={uploadEnabled}
+            onChange={toggleUpload}
+            className="mr-2"
+          />
+          <label htmlFor="enableUpload">Upload a PDF file</label>
+        </div>
+
+        {/* File upload area */}
+        {uploadEnabled && (
+          <div className="mt-2">
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleFileUpload}
+              className="file-input"
+            />
+            {selectedFile && (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Selected file: {selectedFile.name}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div
-      id="scroller"
-      className="w-full overflow-y-scroll overflow-x-hidden h-full justify-end"
-    >
-      <div className="w-full flex flex-col overflow-x-hidden overflow-y-hidden min-h-full justify-end">
-        {messages.map((message, index) => (
-          <motion.div
-            key={index}
-            layout
-            initial={{ opacity: 0, scale: 1, y: 20, x: 0 }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, scale: 1, y: 20, x: 0 }}
-            transition={{
-              opacity: { duration: 0.1 },
-              layout: {
-                type: "spring",
-                bounce: 0.3,
-                duration: messages.indexOf(message) * 0.05 + 0.2,
-              },
-            }}
-            className={cn(
-              "flex flex-col gap-2 p-4 whitespace-pre-wrap",
-              message.role === "user" ? "items-end" : "items-start"
-            )}
-          >
-            <div className="flex gap-3 items-center">
-              {message.role === "user" && (
-                <div className="flex items-end gap-3">
-                  <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
-                    {message.content}
-                  </span>
-                  <Avatar className="flex justify-start items-center overflow-hidden">
-                    <AvatarImage
-                      src="/"
-                      alt="user"
-                      width={6}
-                      height={6}
-                      className="object-contain"
-                    />
-                    <AvatarFallback>
-                      {name && name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
+    <div className="w-full h-full flex flex-col justify-end">
+      <div
+        id="scroller"
+        className="w-full overflow-y-scroll overflow-x-hidden h-full justify-end"
+      >
+        <div className="w-full flex flex-col overflow-x-hidden overflow-y-hidden min-h-full justify-end">
+          {messages.map((message, index) => (
+            <motion.div
+              key={index}
+              layout
+              initial={{ opacity: 0, scale: 1, y: 20, x: 0 }}
+              animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+              exit={{ opacity: 0, scale: 1, y: 20, x: 0 }}
+              transition={{
+                opacity: { duration: 0.1 },
+                layout: {
+                  type: "spring",
+                  bounce: 0.3,
+                  duration: messages.indexOf(message) * 0.05 + 0.2,
+                },
+              }}
+              className={cn(
+                "flex flex-col gap-2 p-4 whitespace-pre-wrap",
+                message.role === "user" ? "items-end" : "items-start"
               )}
-              {message.role === "assistant" && (
-                <div className="flex items-end gap-2">
-                  <Avatar className="flex justify-start items-center">
-                    <AvatarImage
-                      src="/legalX.png"
-                      alt="AI"
-                      width={6}
-                      height={6}
-                      className="object-contain dark:invert"
-                    />
-                  </Avatar>
-                  <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
-                    {/* Check if the message content contains a code block */}
-                    {message.content.split("```").map((part, index) => {
-                      if (index % 2 === 0) {
-                        return (
-                          <Markdown key={index} remarkPlugins={[remarkGfm]}>
-                            {part}
-                          </Markdown>
-                        );
-                      } else {
-                        return (
-                          <pre className="whitespace-pre-wrap" key={index}>
-                            <CodeDisplayBlock code={part} lang="" />
-                          </pre>
-                        );
-                      }
-                    })}
-                    {isLoading &&
-                      messages.indexOf(message) === messages.length - 1 && (
-                        <span className="animate-pulse" aria-label="Typing">
-                          ...
-                        </span>
-                      )}
-                  </span>
+            >
+              <div className="flex gap-3 items-center">
+                {message.role === "user" && (
+                  <div className="flex items-end gap-3">
+                    <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
+                      {message.content}
+                    </span>
+                    <Avatar className="flex justify-start items-center overflow-hidden">
+                      <AvatarImage
+                        src="/"
+                        alt="user"
+                        width={6}
+                        height={6}
+                        className="object-contain"
+                      />
+                      <AvatarFallback>
+                        {name && name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
+                {message.role === "assistant" && (
+                  <div className="flex items-end gap-2">
+                    <Avatar className="flex justify-start items-center">
+                      <AvatarImage
+                        src="/legalX.png"
+                        alt="AI"
+                        width={6}
+                        height={6}
+                        className="object-contain dark:invert"
+                      />
+                    </Avatar>
+                    <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
+                      {message.content.split("```").map((part, index) => {
+                        if (index % 2 === 0) {
+                          return (
+                            <Markdown
+                              key={index}
+                              remarkPlugins={[remarkGfm]}
+                            >
+                              {part}
+                            </Markdown>
+                          );
+                        } else {
+                          return (
+                            <pre
+                              className="whitespace-pre-wrap"
+                              key={index}
+                            >
+                              <CodeDisplayBlock code={part} lang="" />
+                            </pre>
+                          );
+                        }
+                      })}
+                      {isLoading &&
+                        messages.indexOf(message) ===
+                          messages.length - 1 && (
+                          <span
+                            className="animate-pulse"
+                            aria-label="Typing"
+                          >
+                            ...
+                          </span>
+                        )}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
+          {loadingSubmit && (
+            <div className="flex pl-4 pb-4 gap-2 items-center">
+              <Avatar className="flex justify-start items-center">
+                <AvatarImage
+                  src="/ollama.svg"
+                  alt="AI"
+                  className="object-contain w-6 h-6 dark:invert"
+                />
+              </Avatar>
+              <div className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
+                <div className="flex gap-1">
+                  <span className="size-1.5 rounded-full bg-slate-700 motion-safe:animate-[bounce_1s_ease-in-out_infinite] dark:bg-slate-300"></span>
+                  <span className="size-1.5 rounded-full bg-slate-700 motion-safe:animate-[bounce_0.5s_ease-in-out_infinite] dark:bg-slate-300"></span>
+                  <span className="size-1.5 rounded-full bg-slate-700 motion-safe:animate-[bounce_1s_ease-in-out_infinite] dark:bg-slate-300"></span>
                 </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
-        {loadingSubmit && (
-          <div className="flex pl-4 pb-4 gap-2 items-center">
-            <Avatar className="flex justify-start items-center">
-              <AvatarImage
-                src="/ollama.png"
-                alt="AI"
-                width={6}
-                height={6}
-                className="object-contain dark:invert"
-              />
-            </Avatar>
-            <div className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
-              <div className="flex gap-1">
-                <span className="size-1.5 rounded-full bg-slate-700 motion-safe:animate-[bounce_1s_ease-in-out_infinite] dark:bg-slate-300"></span>
-                <span className="size-1.5 rounded-full bg-slate-700 motion-safe:animate-[bounce_0.5s_ease-in-out_infinite] dark:bg-slate-300"></span>
-                <span className="size-1.5 rounded-full bg-slate-700 motion-safe:animate-[bounce_1s_ease-in-out_infinite] dark:bg-slate-300"></span>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        <div id="anchor" ref={bottomRef}></div>
       </div>
-      <div id="anchor" ref={bottomRef}></div>
     </div>
   );
 }
