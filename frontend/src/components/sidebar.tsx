@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import UserSettings from "./user-settings";
 import { useLocalStorageData } from "@/app/hooks/useLocalStorageData";
 import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
-import PullModel from "./pull-model";
+// import PullModel from "./pull-model";
 import {
   Dialog,
   DialogContent,
@@ -122,7 +122,7 @@ export function Sidebar({
           <div className="flex gap-3 items-center ">
             {!isCollapsed && !isMobile && (
               <Image
-                src="/ollama.png"
+                src="/legalX.png"
                 alt="AI"
                 width={28}
                 height={28}

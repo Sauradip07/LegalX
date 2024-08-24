@@ -1,35 +1,35 @@
 export const INITIAL_QUESTIONS = [
   {
-    content: "What is the capital of France?",
+    content: "What are my fundamental legal rights?",
   },
   {
-    content: 'Who wrote "To Kill a Mockingbird"?',
+    content: 'What should I check before signing a contract?',
   },
   {
-    content: "What is the boiling point of water in Celsius?",
+    content: "What should I include in a contract to protect my interests?",
   },
   {
-    content: "How many planets are there in our solar system?",
+    content: "What are my rights as an employee?",
   },
   {
-    content: "What year did the Titanic sink?",
+    content: "How do I draft Articles of Incorporation or a Partnership Agreement?",
   },
   {
-    content: "Who painted the Mona Lisa?",
+    content: "What should be included in an employment contract for my startup?",
   },
   {
-    content: "What is the square root of 144?",
+    content: "What is the process for resolving workplace conflicts or grievances?",
   },
   {
-    content: "Who is the current President of the United States?",
+    content: "What is the significance of witness signatures and notarization?",
   },
   {
-    content: "What is the tallest mountain in the world?",
+    content: "What legal documents are necessary for starting a new business?",
   },
   {
-    content: "What is the chemical symbol for gold?",
+    content: "How do I draft a Privacy Policy that meets legal requirements?",
   },
   {
-    content: "Who discovered penicillin?",
+    content: "How do I spot ambiguous or misleading language in a legal document?",
   },
 ];
