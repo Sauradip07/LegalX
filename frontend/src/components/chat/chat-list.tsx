@@ -87,15 +87,15 @@ export default function ChatList({
         <div className="relative flex flex-col gap-4 items-center justify-center w-full h-full">
           <div></div>
           <div className="flex flex-col gap-4 items-center">
-          {/* <Image
-                src="../../../public/legalX.png"
-                alt="AI"
-                width={28}
-                height={28}
-                className="dark:invert hidden 2xl:block"
-              /> */}
+          <Image
+            src={require('../../../public/legalX.png')}
+            alt="AI"
+            width={150}
+            height={150}
+            className="dark:invert hidden 2xl:block"
+          />
             <p className="text-center text-lg text-muted-foreground">
-              How can I help you today?
+            How may I assist with your legal concerns today?
             </p>
           </div>
 
