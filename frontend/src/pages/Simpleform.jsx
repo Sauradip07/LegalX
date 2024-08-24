@@ -16,7 +16,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Toaster } from "react-hot-toast";
 import { Label } from "@/components/ui/label";
 import { TiUpload } from "react-icons/ti";
-import Man from "../assets/Man.png";
+import LegalX from "../assets/LegalX.png";
 import Image from "next/image";
 
 const FormSchema = z.object({
@@ -37,7 +37,9 @@ export function Simpleform() {
     },
   });
 
-  function onSubmit(data) {}
+  function onSubmit(data) {
+
+  }
 
   return (
     <div className="p-5 flex flex-col h-screen justify-between items-center">
@@ -47,7 +49,8 @@ export function Simpleform() {
         </h1>
       </div>
       <div className="">
-        <Image src={Man} width={250} className="" alt="logo" />
+        <Image src={LegalX} width={150} className="lg:hidden" alt="logo" />
+        <Image src={LegalX} width={250} className="hidden lg:block" alt="logo" />
       </div>
       <div className="w-full md:max-w-[69%] md:mx-auto">
         <Form {...form}>
