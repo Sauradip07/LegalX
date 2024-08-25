@@ -71,8 +71,8 @@ export default function ChatBottombar({
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
     try {
-      const response = await axios.post("http://localhost:8080/endpoint", {
-        message: input,
+      const response = await axios.post("http://13.235.73.131/ask", {
+        question: input,
       });
       console.log("Response:", response.data);
       // Handle response if needed
