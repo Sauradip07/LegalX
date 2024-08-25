@@ -273,9 +273,11 @@ export default function Chat() {
 
     try {
       const response = await axios.post("http://13.235.73.131/ask", { question: input });
+      // Assuming the answer is in response.data.answer
+      const answer = response.data.answer || response.data;
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: response.data },
+        { role: "assistant", content: answer },
       ]);
     } catch (error) {
       console.error("Error sending message:", error);
